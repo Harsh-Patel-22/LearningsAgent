@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+/agent/
+/data/
+/.venv/
+/venv/
+__pycache__/
+*.py[cod]

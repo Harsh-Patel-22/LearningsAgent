@@ -1,0 +1,67 @@
+# CMOS Windows-Native Requirements
+# Tested on Windows 10/11 with Python 3.11
+#
+# Key differences from Linux/Mac version:
+#   - paddlepaddle replaced with paddlepaddle-windows wheel
+#   - opencv-python (not headless) for Windows
+#   - psycopg2-binary (pre-compiled wheel, no build tools needed)
+#   - No system-level dependencies required
+
+# ── CORE AI / LLM ──────────────────────────────────
+anthropic>=0.34.0
+openai>=1.45.0
+httpx>=0.27.0
+
+# ── DATA MODELS ────────────────────────────────────
+pydantic>=2.8.0
+python-dotenv>=1.0.0
+
+# ── WEB FRAMEWORK ──────────────────────────────────
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
+
+# ── DATABASE ───────────────────────────────────────
+sqlalchemy>=2.0.0
+alembic>=1.13.0
+psycopg2-binary>=2.9.0         # pre-compiled, no build tools
+
+# ── VECTOR DB ──────────────────────────────────────
+qdrant-client>=1.11.0
+
+# ── TASK QUEUE ─────────────────────────────────────
+celery>=5.4.0
+redis>=5.0.0
+
+# ── IMAGE PROCESSING ───────────────────────────────
+Pillow>=10.0.0
+opencv-python>=4.10.0          # Windows: use opencv-python not headless
+
+# ── OCR ────────────────────────────────────────────
+# PaddleOCR on Windows — install in this EXACT order (see setup guide)
+# DO NOT pip install paddlepaddle directly — use the CPU wheel below
+# paddlepaddle             <- installed separately (see WINDOWS_SETUP.md)
+# paddleocr>=2.8.0         <- installed after paddlepaddle
+
+# Tesseract fallback (recommended to install as backup)
+pytesseract>=0.3.10            # Python wrapper — also install Tesseract binary
+
+# ── AUDIO TRANSCRIPTION ────────────────────────────
+openai-whisper>=20240930
+# Whisper on Windows needs ffmpeg — install via: winget install Gyan.FFmpeg
+
+# ── EMBEDDINGS ─────────────────────────────────────
+sentence-transformers>=3.1.0
+numpy>=1.26.0
+torch>=2.4.0                   # CPU version is fine for embeddings
+
+# ── NLP / NER ──────────────────────────────────────
+spacy>=3.7.0
+
+# ── CLUSTERING ─────────────────────────────────────
+hdbscan>=0.8.38
+scikit-learn>=1.5.0
+
+# ── GRAPH DB (optional) ────────────────────────────
+# neo4j>=5.0.0               # install only if using Neo4j
+pymupdf>=1.24.0

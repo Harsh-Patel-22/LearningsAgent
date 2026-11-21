@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognitive Memory OS - Web Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --panel-bg: rgba(17, 24, 39, 0.7);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-glow: linear-gradient(135deg, #6366f1, #3b82f6);
+            --accent-cyan: #06b6d4;
+            --accent-purple: #a855f7;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        header {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--panel-border);
+            backdrop-filter: blur(12px);
+            background: rgba(11, 15, 25, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-glow);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-family: var(--font-display);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+        }
+
+        .logo-text {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.25rem;
+            letter-spacing: 0.5px;
+            background: linear-gradient(to right, #ffffff, #9ca3af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .reset-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--error-color);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .reset-btn:hover {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: var(--error-color);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+
+        main {
+            flex: 1;
+            padding: 30px 40px;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 1024px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Tabs layout for Ingestion */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.95rem;
+            font-family: var(--font-display);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .tab-btn.active {
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -11px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-glow);
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        input[type="text"], input[type="date"], textarea {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            padding: 12px;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            transition: border-color 0.2s ease;
+            width: 100%;
+        }
+
+        input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
+            border-color: #6366f1;
+            outline: none;
+            box-shadow: 0 0 5px rgba(99, 102, 241, 0.3);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        /* Drag and Drop Zone */
+        .upload-zone {
+            border: 2px dashed var(--panel-border);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.01);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #6366f1;
+            background: rgba(99, 102, 241, 0.03);
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            background: var(--accent-glow);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn:disabled {
+            background: var(--panel-border);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Memories Listing */
+        .memories-container {
+            margin-top: 30px;
+            border-top: 1px solid var(--panel-border);
+            padding-top: 20px;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .memory-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s ease;
+        }
+
+        .memory-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .memory-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .memory-title {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .memory-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 10px;
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        /* Chat Panel */
+        .chat-thread {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 10px 0;
+            min-height: 400px;
+            max-height: 600px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .message.user {
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.agent {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            white-space: pre-wrap;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-container input {
+            flex: 1;
+        }
+
+        /* Ingestion status overlay */
+        .status-overlay {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon">M</div>
+            <div class="logo-text">Cognitive Memory OS</div>
+        </div>
+        <button class="reset-btn" onclick="resetDatabase()">Reset CMOS</button>
+    </header>
+
+    <main>
+        <!-- Left Panel: Ingestion -->
+        <div class="glass-panel">
+            <h2>Add Diary Experience</h2>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('text')">Paste Text</button>
+                <button class="tab-btn" onclick="switchTab('file')">Upload Image/PDF</button>
+            </div>
+
+            <!-- Ingest Text Form -->
+            <div id="text-tab" class="tab-content active">
+                <div class="form-group">
+                    <label for="text-date">Date (Optional)</label>
+                    <input type="date" id="text-date">
+                </div>
+                <div class="form-group">
+                    <label for="text-content">What happened today?</label>
+                    <textarea id="text-content" placeholder="Share details, decisions made, emotions felt, and people involved..."></textarea>
+                </div>
+                <button class="btn" id="submit-text-btn" onclick="submitText()">Save Experience</button>
+            </div>
+
+            <!-- Ingest File Form -->
+            <div id="file-tab" class="tab-content">
+                <div class="form-group">
+                    <label for="file-date">Date (Optional)</label>
+                    <input type="date" id="file-date">
+                </div>
+                <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                    <span class="upload-icon">📁</span>
+                    <p>Drag & drop scanned PDF or image here, or click to browse</p>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">Supports PDF, PNG, JPG, JPEG</span>
+                    <input type="file" id="file-input" style="display: none;" onchange="handleFileSelect(event)">
+                </div>
+                <div id="file-info" style="display: none; font-size: 0.9rem; text-align: center; color: var(--accent-cyan);"></div>
+                <button class="btn" id="submit-file-btn" onclick="submitFile()" disabled>Upload & Process File</button>
+            </div>
+
+            <!-- Memories Feed -->
+            <div class="memories-container">
+                <h3 style="font-size: 0.95rem; margin-bottom: 12px; color: var(--text-secondary);">Stored Archives</h3>
+                <div id="memories-list">
+                    <!-- Dynamic List -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Chat/Guidance -->
+        <div class="glass-panel">
+            <h2>Seek Guidance & Recall</h2>
+            
+            <div class="chat-thread" id="chat-thread">
+                <div class="message agent">Welcome back to CMOS. Ask me anything about your past incidents, behavior scripts, or request guidance on new decisions.</div>
+            </div>
+
+            <div class="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Type your query here..." onkeypress="handleChatKeyPress(event)">
+                <button class="btn" onclick="sendChatMessage()">Ask Agent</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Global Toast Alert -->
+    <div class="status-overlay" id="status-toast"></div>
+
+    <script>
+        let selectedFile = null;
+
+        // Fetch stored memories on load
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchMemories();
+        });
+
+        // Tab Switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tab === 'text') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('text-tab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('file-tab').classList.add('active');
+            }
+        }
+
+        // Show toast notifications
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('status-toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            if (isError) {
+                toast.style.background = 'rgba(239, 68, 68, 0.15)';
+                toast.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                toast.style.color = '#f87171';
+            } else {
+                toast.style.background = 'rgba(16, 185, 129, 0.15)';
+                toast.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                toast.style.color = '#34d399';
+            }
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 5000);
+        }
+
+        // Fetch memories list
+        async function fetchMemories() {
+            try {
+                const r = await fetch('/api/memories');
+                const d = await r.json();
+                const list = document.getElementById('memories-list');
+                list.innerHTML = '';
+                
+                if (d.memories.length === 0) {
+                    list.innerHTML = '<div style="font-size: 0.85rem; color: var(--text-secondary); text-align: center; padding: 20px;">No archive entries found yet.</div>';
+                    return;
+                }
+
+                d.memories.forEach(m => {
+                    const item = document.createElement('div');
+                    item.className = 'memory-item';
+                    item.innerHTML = `
+                        <div class="memory-info">
+                            <span class="memory-title">${m.title}</span>
+                            <div class="memory-meta">
+                                <span>${m.date}</span>
+                                <span class="badge">${m.memory_type}</span>
+                            </div>
+                        </div>
+                    `;
+                    list.appendChild(item);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // Save Text Ingestion
+        async function submitText() {
+            const text = document.getElementById('text-content').value.strip || document.getElementById('text-content').value.trim();
+            const date = document.getElementById('text-date').value;
+            const btn = document.getElementById('submit-text-btn');
+
+            if (!text) {
+                showToast("Please enter experience details.", true);
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = "Saving...";
+            showToast("Ingesting experience & running background updates...");
+
+            try {
+                const r = await fetch('/api/ingest/text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, date })
+                });
+                const res = await r.json();
+                if (r.ok) {
+                    showToast("Successfully integrated experience into knowledge base!");
+                    document.getElementById('text-content').value = '';
+                    fetchMemories();
+                } else {
+                    showToast("Error: " + res.error, true);
+                }
+            } catch (err) {
+                showToast("Error communicating with server.", true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Save Experience";
+            }
+        }
+
+        // Handle file selection
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                selectedFile = files[0];
+                const info = document.getElementById('file-info');
+                info.style.display = 'block';
+                info.textContent = `Selected: ${selectedFile.name} (${(selectedFile.size / 1024 / 1024).toFixed(2)} MB)`;
+                document.getElementById('submit-file-btn').disabled = false;
+            }
+        }
+
+        // Upload and process image or PDF
+        async function submitFile() {
+            if (!selectedFile) return;
+            const date = document.getElementById('file-date').value;
+            const btn = document.getElementById('submit-file-btn');
+            
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            if (date) formData.append('date', date);
+
+            btn.disabled = true;
+            btn.textContent = "Processing File (OCR & Analysis)...";
+            showToast("Uploading file to CMOS processing queue...");
+
+            try {
+                const r = await fetch('/api/ingest/file', {
+                    method: 'POST',
+                    body: formData
+                });
+                const res = await r.json();
+                
+                if (r.ok) {
+                    if (res.type === 'pdf') {
+                        showToast(`Successfully processed PDF! Ingested ${res.pages_processed} pages and extracted ${res.memories_created} memories.`);
+                    } else {
+                        showToast(`Successfully processed image! Extracted ${res.memories_created} memories.`);
+                    }
+                    selectedFile = null;
+                    document.getElementById('file-input').value = '';
+                    document.getElementById('file-info').style.display = 'none';
+                    fetchMemories();
+                } else {
+                    showToast("Error processing file: " + res.error, true);
+                }
+            } catch (err) {
+                showToast("Error communicating with server.", true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Upload & Process File";
+            }
+        }
+
+        // Drag & Drop event bindings
+        const dropZone = document.getElementById('drop-zone');
+        ['dragenter', 'dragover'].forEach(name => {
+            dropZone.addEventListener(name, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            }, false);
+        });
+        ['dragleave', 'drop'].forEach(name => {
+            dropZone.addEventListener(name, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            }, false);
+        });
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                selectedFile = files[0];
+                document.getElementById('file-input').files = files;
+                const info = document.getElementById('file-info');
+                info.style.display = 'block';
+                info.textContent = `Selected: ${selectedFile.name} (${(selectedFile.size / 1024 / 1024).toFixed(2)} MB)`;
+                document.getElementById('submit-file-btn').disabled = false;
+            }
+        });
+
+        // Chat operations
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Add user message to UI
+            appendMessage(message, 'user');
+            input.value = '';
+
+            // Add thinking message
+            const thinkingDiv = appendMessage('Agent is retrieving memories and synthesizing guidance...', 'agent');
+
+            try {
+                const r = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                const d = await r.json();
+                
+                thinkingDiv.remove();
+                if (r.ok) {
+                    appendMessage(d.response, 'agent');
+                } else {
+                    appendMessage("Error: " + d.error, 'agent');
+                }
+            } catch (err) {
+                thinkingDiv.remove();
+                appendMessage("Error communicating with server.", 'agent');
+            }
+        }
+
+        function handleChatKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function appendMessage(text, sender) {
+            const thread = document.getElementById('chat-thread');
+            const msg = document.createElement('div');
+            msg.className = `message ${sender}`;
+            msg.textContent = text;
+            thread.appendChild(msg);
+            thread.scrollTop = thread.scrollHeight;
+            return msg;
+        }
+
+        // Reset database
+        async function resetDatabase() {
+            if (!confirm("Are you sure you want to wipe all local memory records and clear Qdrant index? This cannot be undone.")) return;
+            showToast("Wiping database...");
+            try {
+                const r = await fetch('/api/reset', { method: 'POST' });
+                if (r.ok) {
+                    showToast("CMOS has been completely reset.");
+                    fetchMemories();
+                    document.getElementById('chat-thread').innerHTML = '<div class="message agent">Welcome back to CMOS. Ask me anything about your past incidents, behavior scripts, or request guidance on new decisions.</div>';
+                } else {
+                    showToast("Error resetting database", true);
+                }
+            } catch (err) {
+                showToast("Error communicating with server", true);
+            }
+        }
+    </script>
+</body>
+</html>

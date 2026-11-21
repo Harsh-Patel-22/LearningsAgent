@@ -1,0 +1,49 @@
+name: learnings-agent
+
+services:
+  api:
+    image: learnings-agent:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    depends_on:
+      qdrant:
+        condition: service_healthy
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: "6333"
+    ports:
+      - "127.0.0.1:${CMOS_PORT:-8000}:8000"
+    volumes:
+      - app_data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/', timeout=2).close()"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+
+  qdrant:
+    # Qdrant 1.18.2
+    image: qdrant/qdrant@sha256:75eab8c4ba42096724fdcfde8b4de0b5713d529dde32f285a1f86fdcb2c9e50c
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -ec
+        - |
+          exec 3<>/dev/tcp/127.0.0.1/6333
+          printf 'GET /readyz HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3
+          read -r protocol status reason <&3
+          [[ "$$status" == 200 ]]
+      interval: 3s
+      timeout: 2s
+      retries: 15
+
+volumes:
+  app_data:
+    external: true
+    name: ${CMOS_DATA_VOLUME:-learnings-agent-data}
+  qdrant_data:

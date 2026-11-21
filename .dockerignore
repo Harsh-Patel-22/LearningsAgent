@@ -1,0 +1,16 @@
+**
+!agent.py
+!detector.py
+!engine.py
+!extractor.py
+!memory_repo.py
+!models.py
+!orchestrator.py
+!pdf_parser.py
+!pii_masker.py
+!pipeline.py
+!web_server.py
+!windows_compat.py
+!templates/
+!templates/index.html
+!requirements_docker.txt
